@@ -2,15 +2,18 @@ using UnityEngine;
 
 public class CoordinateSystem : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private GameManager gameManager;
+    [SerializeField] private Camera mainCamera;
+
     [Header("Grid Settings")]
-    [SerializeField] private int gridSize = 50;
-    [SerializeField] private float gridSpacing = 1f;
-    [SerializeField] private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+    [SerializeField] private float gridSpacing = 5f;
+    [SerializeField] private Color gridColor = new(0.5f, 0.5f, 0.5f, 0.3f);
     [SerializeField] private float gridLineWidth = 0.002f;
 
     [Header("Axis Settings")]
     [SerializeField] private Color axisColor = Color.black;
-    [SerializeField] private float axisWidth = 0.05f;
+    [SerializeField] private float axisWidth = 0.2f;
 
     //[Header("Label Settings")]
     //[SerializeField] private int labelInterval = 5;
@@ -19,33 +22,49 @@ public class CoordinateSystem : MonoBehaviour
     //[SerializeField] private int characterSize = 100; // Higher = sharper text
     //[SerializeField] private Color labelColor = Color.black;
 
-    [Header("Camera")]
-    [SerializeField] private Camera mainCamera;
+    private int numLinesNegX;
+    private int numLinesPosX;
+    private int numLinesNegY;
+    private int numLinesPosY;
 
-    void Start()
+    private float lastCamSize;
+
+    private void Start()
     {
-        if (mainCamera == null)
-            mainCamera = Camera.main;
+        if (mainCamera == null) mainCamera = Camera.main;
+        lastCamSize = mainCamera.orthographicSize;
+    }
+
+    private void LateUpdate()
+    {
+        UpdateLineWidths();
+    }
+
+    public void UpdateGrid(float minX, float maxX, float minY, float maxY)
+    {
+        DeleteGrid();
+
+        numLinesNegX = (int)(minX / gridSpacing);
+        numLinesPosX = (int)(maxX / gridSpacing);
+        numLinesNegY = (int)(minY / gridSpacing);
+        numLinesPosY = (int)(maxY / gridSpacing);
 
         CreateGrid();
         CreateAxes();
         //CreateLabels();
     }
 
-    void LateUpdate()
-    {
-        // Scale line widths based on camera zoom to keep them visible
-        UpdateLineWidths();
-    }
-
-    void UpdateLineWidths()
+    // Scale line widths based on camera zoom to keep them visible
+    private void UpdateLineWidths()
     {
         if (mainCamera == null) return;
 
         float camSize = mainCamera.orthographicSize;
+        if (camSize == lastCamSize) return;
 
         // Update grid lines
         GameObject gridParent = transform.Find("Grid")?.gameObject;
+        GameObject axesParent = transform.Find("Axes")?.gameObject;
         if (gridParent != null)
         {
             foreach (LineRenderer lr in gridParent.GetComponentsInChildren<LineRenderer>())
@@ -54,71 +73,81 @@ public class CoordinateSystem : MonoBehaviour
                 lr.endWidth = gridLineWidth * camSize;
             }
         }
+        if (axesParent != null)
+        {
+            foreach (LineRenderer lr in axesParent.GetComponentsInChildren<LineRenderer>())
+            {
+                lr.startWidth = axisWidth * camSize;
+                lr.endWidth = axisWidth * camSize;
+            }
+        }
+
+        lastCamSize = camSize;
     }
 
-    void CreateGrid()
+    private void CreateGrid()
     {
-        GameObject gridParent = new GameObject("Grid");
+        GameObject gridParent = new("Grid");
         gridParent.transform.parent = transform;
 
         // Vertical lines
-        for (int x = -gridSize; x <= gridSize; x++)
+        for (int x = numLinesNegX; x <= numLinesPosX; x++)
         {
             if (x == 0) continue; // Skip center (axis)
             CreateLine(
                 $"GridV_{x}", 
-                new Vector3(x * gridSpacing, -gridSize * gridSpacing, 0),
-                new Vector3(x * gridSpacing, gridSize * gridSpacing, 0), 
+                new Vector3(x * gridSpacing, numLinesNegY * gridSpacing, 0),
+                new Vector3(x * gridSpacing, numLinesPosY * gridSpacing, 0), 
                 gridColor,
-                gridLineWidth, 
+                gridLineWidth * mainCamera.orthographicSize, 
                 gridParent.transform
             );
         }
 
         // Horizontal lines
-        for (int y = -gridSize; y <= gridSize; y++)
+        for (int y = numLinesNegY; y <= numLinesPosY; y++)
         {
             if (y == 0) continue; // Skip center (axis)
             CreateLine(
                 $"GridH_{y}", 
-                new Vector3(-gridSize * gridSpacing, y * gridSpacing, 0),
-                new Vector3(gridSize * gridSpacing, y * gridSpacing, 0), 
+                new Vector3(numLinesNegX * gridSpacing, y * gridSpacing, 0),
+                new Vector3(numLinesPosX * gridSpacing, y * gridSpacing, 0), 
                 gridColor,
-                gridLineWidth, 
+                gridLineWidth * mainCamera.orthographicSize, 
                 gridParent.transform
             );
         }
     }
 
-    void CreateAxes()
+    private void CreateAxes()
     {
-        GameObject axesParent = new GameObject("Axes");
+        GameObject axesParent = new("Axes");
         axesParent.transform.parent = transform;
 
         // X-axis
         CreateLine(
             "X-Axis", 
-            new Vector3(-gridSize * gridSpacing, 0, 0),
-            new Vector3(gridSize * gridSpacing, 0, 0), 
-            axisColor, 
-            axisWidth, 
+            new Vector3(numLinesNegX * gridSpacing, 0, 0),
+            new Vector3(numLinesPosX * gridSpacing, 0, 0), 
+            axisColor,
+            axisWidth * mainCamera.orthographicSize, 
             axesParent.transform
         );
 
         // Y-axis
         CreateLine(
             "Y-Axis", 
-            new Vector3(0, -gridSize * gridSpacing, 0),
-            new Vector3(0, gridSize * gridSpacing, 0), 
-            axisColor, 
-            axisWidth, 
+            new Vector3(0, numLinesNegY * gridSpacing, 0),
+            new Vector3(0, numLinesPosY * gridSpacing, 0), 
+            axisColor,
+            axisWidth * mainCamera.orthographicSize, 
             axesParent.transform
         );
     }
 
-    void CreateLine(string name, Vector3 start, Vector3 end, Color color, float width, Transform parent)
+    private void CreateLine(string name, Vector3 start, Vector3 end, Color color, float width, Transform parent)
     {
-        GameObject lineObj = new GameObject(name);
+        GameObject lineObj = new(name);
         lineObj.transform.parent = parent;
         LineRenderer lr = lineObj.AddComponent<LineRenderer>();
 
@@ -133,7 +162,7 @@ public class CoordinateSystem : MonoBehaviour
         lr.sortingOrder = -1;
     }
 
-    //void CreateLabels()
+    //private void CreateLabels()
     //{
     //    GameObject labelsParent = new GameObject("Labels");
     //    labelsParent.transform.parent = transform;
@@ -177,4 +206,13 @@ public class CoordinateSystem : MonoBehaviour
     //        MeshRenderer mr = textObj.GetComponent<MeshRenderer>();
     //        mr.sortingOrder = 1;
     //    }
+
+    private void DeleteGrid()
+    {
+        GameObject gridParent = transform.Find("Grid")?.gameObject;
+        GameObject axesParent = transform.Find("Axes")?.gameObject;
+
+        if (gridParent != null) Destroy(gridParent);
+        if (axesParent != null) Destroy(axesParent);
+    }
 }
