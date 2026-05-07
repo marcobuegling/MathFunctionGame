@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     private Rigidbody2D riderRB;
 
     private bool isRunning;
-    //private bool menuActive;
+    private bool menuActive;
 
     private GameObject rewards;
 
@@ -40,9 +40,9 @@ public class GameManager : MonoBehaviour
         riderRB = rider.GetComponent<Rigidbody2D>();
 
         isRunning = false;
+        menuActive = false;
         Time.timeScale = 0f;
         speedFactor = 1.0f;
-        //menuActive = false;
     }
 
     private void Start()
@@ -59,13 +59,38 @@ public class GameManager : MonoBehaviour
     public void Stop()
     {
         isRunning = false;
-        Time.timeScale = 0f;
     }
 
     public void Run()
     {
         isRunning = true;
-        Time.timeScale = speedFactor;
+    }
+
+    public void OpenPauseMenu()
+    {
+        menuActive = true;
+    }
+
+    public void ClosePauseMenu()
+    {
+        menuActive = false;
+    }
+
+    private void Update()
+    {
+        UpdateGameSpeed();
+    }
+
+    private void UpdateGameSpeed()
+    {
+        if (isRunning && !menuActive)
+        {
+            Time.timeScale = speedFactor;
+        }
+        else
+        {
+            Time.timeScale = 0f;
+        }
     }
 
     public void LoadLevel(Level level)
@@ -125,4 +150,13 @@ public class GameManager : MonoBehaviour
     public float GetXBoundHigh() { return maxX; }
     public float GetYBoundLow() { return minY; }
     public float GetYBoundHigh() {  return maxY; }
+
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
+    }
 }
