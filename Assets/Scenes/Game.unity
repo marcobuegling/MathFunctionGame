@@ -1053,12 +1053,57 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
   gameManager: {fileID: 1727824705}
+  controls: {fileID: 572535617}
   zoomSpeed: 4
   minZoom: 1
   maxZoom: 100
   zoomSmoothness: 0.1
   panSpeed: 0.008
   panSmoothness: 0.1
+--- !u!1 &572535616
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 572535618}
+  - component: {fileID: 572535617}
+  m_Layer: 0
+  m_Name: ControlsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &572535617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572535616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e8ca80ee4f061478d07093d779d0d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+--- !u!4 &572535618
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572535616}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &591797714
 GameObject:
   m_ObjectHideFlags: 0
@@ -3053,12 +3098,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4125fd822e04554b988effd34fb1d35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  controls: {fileID: 572535617}
   mainCamera: {fileID: 519420033}
   graph: {fileID: 598143404}
   grid: {fileID: 168686409}
   playPauseButton: {fileID: 591797719}
   inputManager: {fileID: 1447210303}
   counter: {fileID: 865828213}
+  pauseMenu: {fileID: 2141087239}
   rider: {fileID: 20971565}
   rewardPrefab: {fileID: 1282996746375653986, guid: e3856a96140ef8b4193ac6d1e60c1dca, type: 3}
   currentLevel: {fileID: 11400000, guid: b78412b99e904cb4e97f217b491205aa, type: 2}
@@ -3767,12 +3814,13 @@ RectTransform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1727824706}
+  - {fileID: 572535618}
   - {fileID: 519420032}
   - {fileID: 619394802}
-  - {fileID: 1727824706}
   - {fileID: 598143405}
   - {fileID: 20971567}
-  - {fileID: 21864190}
-  - {fileID: 1394816616}
   - {fileID: 168686410}
+  - {fileID: 21864190}
   - {fileID: 2141087243}
+  - {fileID: 1394816616}

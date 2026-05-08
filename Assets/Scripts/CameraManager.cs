@@ -7,6 +7,7 @@ public class CameraManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private ControlsManager controls;
 
     [Header("Zoom Settings")]
     [SerializeField] private float zoomSpeed = 2.5f;
@@ -27,8 +28,6 @@ public class CameraManager : MonoBehaviour
     private Camera cam;
     private float camZ;
 
-    private PlayerControls controls;
-
     private float targetSize;
     private Vector2 targetPosition;
 
@@ -40,17 +39,6 @@ public class CameraManager : MonoBehaviour
         targetSize = cam.orthographicSize;
         targetPosition = new Vector2(cam.transform.position.x, cam.transform.position.y);
         camZ = cam.transform.position.z;
-        controls = new PlayerControls();
-    }
-
-    private void OnEnable()
-    {
-        controls.Game.Enable();
-    }
-
-    private void OnDisable()
-    {
-        controls.Game.Disable();
     }
 
     public bool GetMovementEnabled()
@@ -75,12 +63,12 @@ public class CameraManager : MonoBehaviour
         if (!movementEnabled) return;
         // Read scroll wheel and update target zoom first, so position
         // clamping below can use the most up-to-date target size.
-        float scroll = controls.Game.Scroll.ReadValue<float>();
+        float scroll = controls.CameraScroll;
         targetSize -= scroll * zoomSpeed;
         targetSize = Mathf.Clamp(targetSize, minZoom, maxZoom);
 
         // Read arrow keys and update target position
-        Vector2 movement = controls.Game.ArrowKeys.ReadValue<Vector2>();
+        Vector2 movement = controls.CameraMove;
         targetPosition += cam.orthographicSize * panSpeed * movement;
         ClampTargetPosition();
 

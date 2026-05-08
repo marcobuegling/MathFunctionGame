@@ -1,28 +1,34 @@
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
     // Make GameManager singleton
     public static GameManager Instance { get; private set; }
 
+    [Header("References")]
+    [SerializeField] private ControlsManager controls;
     [SerializeField] private CameraManager mainCamera;
     [SerializeField] private GraphWithCollider graph;
     [SerializeField] private CoordinateSystem grid;
     [SerializeField] private PlayPause playPauseButton;
     [SerializeField] private InputManager inputManager;
     [SerializeField] private RewardsCounter counter;
+
+    [Header("Game objects")]
+    [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject rider;
     [SerializeField] private GameObject rewardPrefab;
 
+    [Header("Starting game state")]
     [SerializeField] private Level currentLevel;
 
+    private GameObject rewards;
     private Rigidbody2D riderRB;
 
     private bool isRunning;
     private bool menuActive;
-
-    private GameObject rewards;
 
     // Current level boundaries
     private float minX;
@@ -41,14 +47,29 @@ public class GameManager : MonoBehaviour
 
         isRunning = false;
         menuActive = false;
+        pauseMenu.SetActive(false);
         Time.timeScale = 0f;
         speedFactor = 1.0f;
     }
 
     private void Start()
     {
-        
         LoadLevel(currentLevel);
+    }
+
+    private void Update()
+    {
+        UpdateGameSpeed();
+    }
+
+    private void OnEnable()
+    {
+        controls.PausePressed += TogglePauseMenu;
+    }
+
+    private void OnDisable()
+    {
+        controls.PausePressed -= TogglePauseMenu;
     }
 
     public bool IsRunning()
@@ -66,19 +87,18 @@ public class GameManager : MonoBehaviour
         isRunning = true;
     }
 
-    public void OpenPauseMenu()
+    public void TogglePauseMenu()
     {
-        menuActive = true;
-    }
-
-    public void ClosePauseMenu()
-    {
-        menuActive = false;
-    }
-
-    private void Update()
-    {
-        UpdateGameSpeed();
+        if (menuActive)
+        {
+            menuActive = false;
+            pauseMenu.SetActive(false);
+        }
+        else
+        {
+            pauseMenu.SetActive(true);
+            menuActive = true;
+        }
     }
 
     private void UpdateGameSpeed()
