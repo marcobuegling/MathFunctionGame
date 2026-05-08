@@ -4,8 +4,7 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
-    // Make GameManager singleton
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance { get; private set; } // make GameManager singleton
 
     [Header("References")]
     [SerializeField] private ControlsManager controls;
@@ -40,8 +39,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this) 
+        { 
+            Destroy(gameObject);
+            return; 
+        }
         Instance = this;
+
+        DontDestroyOnLoad(gameObject);
 
         riderRB = rider.GetComponent<Rigidbody2D>();
 

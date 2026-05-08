@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/LevelSelection.unity
+    guid: d2cf378f93adc5043ac982aba06ca3e4
+  - enabled: 1
+    path: Assets/Scenes/Settings.unity
+    guid: 3ac3f95fdb6179149b5e6a0897207f7e
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 27adaef906121f84b884fa61a5d60d27
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 40157a638f6ea9f4d8229c56513f3023, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: ab786842546181b458091bdf9dcf595b, type: 3}

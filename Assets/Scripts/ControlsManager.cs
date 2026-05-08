@@ -4,6 +4,7 @@ using System;
 
 public class ControlsManager : MonoBehaviour
 {
+    public static ControlsManager Instance { get; private set; } // make ControlsManager singleton
 
     private PlayerControls controls;
 
@@ -14,18 +15,32 @@ public class ControlsManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        DontDestroyOnLoad(gameObject);
+
         controls = new PlayerControls();
     }
 
     private void OnEnable()
     {
-        controls.Enable();
-
         controls.Game.Movement.performed += OnCameraMove;
         controls.Game.Movement.canceled += OnCameraMove;
         controls.Game.Scroll.performed += OnCameraScroll;
         controls.Game.Scroll.canceled += OnCameraScroll;
         controls.Game.Pause.performed += OnPause;
+
+        EnableControls();
+    }
+
+    public void EnableControls()
+    {
+        controls.Enable();
     }
 
     private void OnDisable()
@@ -36,6 +51,11 @@ public class ControlsManager : MonoBehaviour
         controls.Game.Scroll.canceled -= OnCameraScroll;
         controls.Game.Pause.performed -= OnPause;
 
+        DisableControls();
+    }
+
+    public void DisableControls()
+    {
         controls.Disable();
     }
 
